@@ -1,10 +1,13 @@
 {
   "expo": {
-    "name": "lab7",
-    "slug": "lab7",
+    "name": "lab4",
+    "slug": "lab4",
     "version": "1.0.0",
-    "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "ios": {
+      "requireFullScreen": true,
+      "supportsTablet": true
+    },
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -16,9 +19,6 @@
     "assetBundlePatterns": [
       "**/*"
     ],
-    "ios": {
-      "supportsTablet": true
-    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
