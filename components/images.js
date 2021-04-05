@@ -9,6 +9,9 @@ import * as ImagePicker from 'expo-image-picker';
 import { Appbar } from 'react-native-paper';
 import SearchBar from "react-native-dynamic-search-bar";
 import Gallery from "./galery";
+import Image from "react-native-image-progress";
+import {Asset} from "expo-asset";
+import AppLoading from 'expo-app-loading';
 
 const portrait_styles = StyleSheet.create({
     imgContainer: {
@@ -38,7 +41,6 @@ const landscape_styles = StyleSheet.create({
         display: "flex",
         flexWrap: "wrap",
         flexDirection: "row",
-        // marginTop: 10,
     },
     galleryContainer: {
         flex: 1,
@@ -92,6 +94,8 @@ const Images = ({ navigation }) => {
 
     const [gallery, setGallery] = useState([]);
 
+    const [isReady, setIsReady] = useState(false);
+
     const [placeholder, setPlaceholder] = useState('Клікни на зображення');
 
     const goHome = () => {
@@ -109,6 +113,7 @@ const Images = ({ navigation }) => {
         })();
     }, []);
 
+
     const pickImage = async () => {
         const pickedImage = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -124,6 +129,23 @@ const Images = ({ navigation }) => {
         }
 
     };
+
+    function cacheImages(images) {
+        return images.map(image => {
+            if (typeof image.uri === 'string') {
+                console.log(image.uri)
+                return Image.prefetch(image.uri);
+            } else {
+                console.log('else ', image)
+                return Asset.fromModule(image).downloadAsync();
+            }
+        });
+    }
+
+    const _loadAssetsAsync = async () => {
+        const imageAssets = cacheImages(data);
+        await Promise.all([...imageAssets]);
+    }
 
     const useScreenDimensions = () => {
         const [screenData, setScreenData] = useState(Dimensions.get('screen'));
@@ -147,21 +169,31 @@ const Images = ({ navigation }) => {
     const screenData = useScreenDimensions();
 
     const galleryComponent = arraySubSplitter(gallery).map(
-        image => (
-            <Gallery
-                key={image[0].uri}
-                gallery={image}
-                width={screenData.width / 4}
-                height={
-                    screenData.isLandscape === true ?
-                        screenData.height / 2.3 :
-                        screenData.height / 6.5
-                }
-                color={{
-                    backgroundColor: '#000'
-                }}
-            />
-        )
+        image => {
+            if (!isReady) {
+                return (
+                    <AppLoading
+                        key={image[0].uri}
+                        startAsync={_loadAssetsAsync}
+                        onFinish={() => setIsReady(true)}
+                        onError={console.warn}
+                    />
+                );
+            } else {
+                return (
+                    <Gallery
+                        key={image[0].uri}
+                        gallery={image}
+                        width={screenData.width / 4}
+                        height={
+                            screenData.isLandscape === true ?
+                                screenData.height / 2.3 :
+                                screenData.height / 6.5
+                        }
+                    />
+                )
+            }
+        }
     );
 
     return (

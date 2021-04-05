@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
     View, StyleSheet,
-    Alert, TouchableHighlight,
+    Alert, TouchableHighlight, AsyncStorage,
 } from 'react-native';
 import Image from 'react-native-image-progress';
 
@@ -16,18 +16,17 @@ const styles = StyleSheet.create({
     }
 })
 
-const Gallery = ({ gallery, width, height, color}) => {
+
+const Gallery = ({ gallery, width, height}) => {
 
     const normalImageSize = {
         width: width,
         height: height,
-        backgroundColor: color,
     }
 
     const doubledImageSize = {
         width: width * 2,
         height: height * 2,
-        backgroundColor: color,
     };
 
     const onPressImage = () => {
@@ -38,11 +37,20 @@ const Gallery = ({ gallery, width, height, color}) => {
         <TouchableHighlight onPress={onPressImage}>
             <Image
                 style={optionsStyles}
-                source={uri}
+                source={{
+                    uri: uri.uri,
+                    cache: 'force-cache'
+                    // Використовується uri з кешу.
+                    // Якщо такого зображення в кеші немає.
+                    // Воно буде взято з API
+                    // Та завантажено в кеш
+                }}
                 threshold={150}
-            />
+        />
         </TouchableHighlight>
     );
+
+    console.log(gallery[0])
 
     return (
         <>

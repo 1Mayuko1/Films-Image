@@ -243,7 +243,7 @@ function Movie({navigation}){
                             <Text  style={{
                                 fontSize: 20,
                             }}>
-                                No image here )
+                                No films here )
                             </Text>
                         </View> :
                     movieData.map((item, index) => {
