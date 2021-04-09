@@ -1,5 +1,156 @@
 import React, { useEffect }from 'react';
 import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import * as Network from 'expo-network';
+import StatusMessage from './statusMessage'
+import {useDispatch, useSelector} from "react-redux";
+import { addFilmInfo } from "../redux/actions";
+
+
+const orientation = () => {
+    const dim = Dimensions.get('screen');
+    if (dim.height >= dim.width) {
+        return portrait_styles
+    } else {
+        return landscape_styles
+    }
+}
+
+const Info = ({route}) => {
+
+    const [fullInfo, setFullInfo] = React.useState([])
+    const { Id } = route.params;
+
+    const { filmInfoStorageData } = useSelector(state => state.filmsReducer);
+    const dispatch = useDispatch();
+
+    const addToStorage = films => dispatch(addFilmInfo(films));
+
+    const handleAddFilmInfo = films => {
+        addToStorage(films);
+    };
+
+    useEffect(() => {
+        let cleanupFunction = false;
+        const fetchData = async () => {
+            try {
+                if((await Network.getNetworkStateAsync()).isConnected) {
+                    // fetch(`https://www.omdbapi.com/?apikey=2965961d&i=${Id}`)
+                    //     .then(response => response.json() )
+                    //     .then(data =>  handleAddFilmInfo([data]) )
+                } else {
+
+                }
+                // if(!cleanupFunction) {
+                //     setFullInfo(['data']);
+                // }
+            } catch (e) {
+                console.error(e.message)
+            }
+        };
+        fetchData();
+        return () => cleanupFunction = true;
+    }, []);
+
+    return (
+        <ScrollView>
+            <View>
+                <View style={{ flex: 0, alignItems: 'center', justifyContent: 'center' }}>
+                    {
+                        filmInfoStorageData.map((item, index) => {
+                            if(item.imdbID !== Id) {
+                                return (
+                                    <View key={Id}>
+                                        <StatusMessage
+                                            text={'Try turning on the Internet or finding a movie info that already exists in the database'}
+                                            additionalText={'There is no information about this movie in the database'}
+                                        />
+                                    </View>
+                                )
+                            } else {
+                                return(
+                                    <View key={Id}>
+                                        <View style={orientation().mainTopContainer}>
+                                            <TouchableHighlight style={orientation().imgContainer}>
+                                                <Image
+                                                    resizeMode="cover"
+                                                    source={
+                                                        item.Poster === 'N/A' ?
+                                                            require('../assets/Coming-Soon.png') :
+                                                            { uri: item.Poster }
+                                                    }
+                                                    style={orientation().img}
+                                                />
+                                            </TouchableHighlight>
+                                            <View style={orientation().topRightContainer}>
+                                                <Text style={orientation().txtTitle}>
+                                                    {item.Title}
+                                                </Text>
+                                                <View>
+                                                    <Text
+                                                        style={orientation().topTxt
+                                                    }>
+                                                        Year - {item.Year}
+                                                    </Text>
+                                                </View>
+                                                <View>
+                                                    <Text
+                                                        style={orientation().topTxt
+                                                    }>
+                                                        Rating: {item.imdbRating}
+                                                    </Text>
+                                                    <Text
+                                                        style={orientation().topTxt
+                                                    }>
+                                                        {item.imdbVotes} people voted
+                                                    </Text>
+                                                </View>
+                                                <View>
+                                                    <Text
+                                                        style={orientation().topTxt
+                                                    }>
+                                                        {item.Genre}
+                                                    </Text>
+                                                </View>
+                                                <View>
+                                                    <Text
+                                                        style={orientation().topTxt
+                                                    }>
+                                                        Duration - {item.Runtime}
+                                                    </Text>
+                                                </View>
+                                            </View>
+                                        </View>
+                                        <View style={orientation().bottomTxtContainer}>
+                                            <Text style={orientation().bottomTitleTxt}>Type</Text>
+                                            <Text style={orientation().bottomTxt}>{item.Type}</Text>
+                                            <Text style={orientation().bottomTitleTxt}>Director</Text>
+                                            <Text style={orientation().bottomTxt}>{item.Director}</Text>
+                                            <Text style={orientation().bottomTitleTxt}>Writer</Text>
+                                            <Text style={orientation().bottomTxt}>{item.Writer}</Text>
+                                            <Text style={orientation().bottomTitleTxt}>Main Cast</Text>
+                                            <Text style={orientation().bottomTxt}>{item.Actors}</Text>
+                                            <Text style={orientation().bottomTitleTxt}>Synopsis</Text>
+                                            <Text style={orientation().bottomTxt}>{item.Plot}</Text>
+                                            <Text style={orientation().bottomTitleTxt}>Released</Text>
+                                            <Text style={orientation().bottomTxt}>{item.Released}</Text>
+                                            <Text style={orientation().bottomTitleTxt}>Other information</Text>
+                                            <Text style={orientation().bottomTxt}>
+                                                The original language of this film - {item.Language}.
+                                                It was released in {item.Country} by {item.Production}.
+                                                Also this film was awarded {item.Awards},
+                                                as well the film was rated by {item.Rated}
+                                            </Text>
+                                        </View>
+                                    </View>
+                                )
+                            }
+                        })
+                    }
+                </View>
+            </View>
+        </ScrollView>
+    )
+}
 
 const portrait_styles = StyleSheet.create({
     mainTopContainer: {
@@ -58,7 +209,7 @@ const landscape_styles = StyleSheet.create({
         alignItems: "center",
     },
     topRightContainer: {
-       width: 180,
+        width: 180,
     },
     imgContainer: {
         marginLeft: '1%',
@@ -99,132 +250,5 @@ const landscape_styles = StyleSheet.create({
         marginBottom: 5,
     },
 });
-
-const orientation = () => {
-    const dim = Dimensions.get('screen');
-    if (dim.height >= dim.width) {
-        return portrait_styles
-    } else {
-        return landscape_styles
-    }
-}
-
-const Info = ({route}) => {
-
-    const [fullInfo, setFullInfo] = React.useState([])
-    const { Id } = route.params;
-
-    useEffect(() => {
-        let cleanupFunction = false;
-        const fetchData = async () => {
-            try {
-                fetch(`http://www.omdbapi.com/?apikey=2965961d&i=${Id}`)
-                    .then(response => response.json() )
-                    .then(data => setFullInfo([data]) )
-
-                if(!cleanupFunction) {
-                    setFullInfo(['data']);
-                }
-            } catch (e) {
-                console.error(e.message)
-            }
-        };
-
-        fetchData();
-
-        return () => cleanupFunction = true;
-    }, []);
-
-    return (
-        <ScrollView>
-            <View>
-                <View style={{ flex: 0, alignItems: 'center', justifyContent: 'center' }}>
-                    {
-                        fullInfo.map((item, index) => {
-                            return(
-                                <View key={index}>
-                                    <View style={orientation().mainTopContainer}>
-                                        <TouchableHighlight style={orientation().imgContainer}>
-                                            <Image
-                                                resizeMode="cover"
-                                                source={
-                                                    item.Poster === 'N/A' ?
-                                                        require('../assets/Coming-Soon.png') :
-                                                        { uri: item.Poster }
-                                                }
-                                                style={orientation().img}
-                                            />
-                                        </TouchableHighlight>
-                                        <View style={orientation().topRightContainer}>
-                                            <Text style={orientation().txtTitle}>
-                                                {item.Title}
-                                            </Text>
-                                            <View>
-                                                <Text
-                                                    style={orientation().topTxt
-                                                }>
-                                                    Year - {item.Year}
-                                                </Text>
-                                            </View>
-                                            <View>
-                                                <Text
-                                                    style={orientation().topTxt
-                                                }>
-                                                    Rating: {item.imdbRating}
-                                                </Text>
-                                                <Text
-                                                    style={orientation().topTxt
-                                                }>
-                                                    {item.imdbVotes} people voted
-                                                </Text>
-                                            </View>
-                                            <View>
-                                                <Text
-                                                    style={orientation().topTxt
-                                                }>
-                                                    {item.Genre}
-                                                </Text>
-                                            </View>
-                                            <View>
-                                                <Text
-                                                    style={orientation().topTxt
-                                                }>
-                                                    Duration - {item.Runtime}
-                                                </Text>
-                                            </View>
-                                        </View>
-                                    </View>
-                                    <View style={orientation().bottomTxtContainer}>
-                                        <Text style={orientation().bottomTitleTxt}>Type</Text>
-                                        <Text style={orientation().bottomTxt}>{item.Type}</Text>
-                                        <Text style={orientation().bottomTitleTxt}>Director</Text>
-                                        <Text style={orientation().bottomTxt}>{item.Director}</Text>
-                                        <Text style={orientation().bottomTitleTxt}>Writer</Text>
-                                        <Text style={orientation().bottomTxt}>{item.Writer}</Text>
-                                        <Text style={orientation().bottomTitleTxt}>Main Cast</Text>
-                                        <Text style={orientation().bottomTxt}>{item.Actors}</Text>
-                                        <Text style={orientation().bottomTitleTxt}>Synopsis</Text>
-                                        <Text style={orientation().bottomTxt}>{item.Plot}</Text>
-                                        <Text style={orientation().bottomTitleTxt}>Released</Text>
-                                        <Text style={orientation().bottomTxt}>{item.Released}</Text>
-                                        <Text style={orientation().bottomTitleTxt}>Other information</Text>
-                                        <Text style={orientation().bottomTxt}>
-                                            The original language of this film - {item.Language}.
-                                            It was released in {item.Country} by {item.Production}.
-                                            Also this film was awarded {item.Awards},
-                                            as well the film was rated by {item.Rated}
-                                        </Text>
-                                    </View>
-                                </View>
-                            )
-                        })
-                    }
-
-                </View>
-            </View>
-        </ScrollView>
-    )
-}
-
 
 export default Info

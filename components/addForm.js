@@ -5,6 +5,8 @@ import { View,
 } from 'react-native';
 import { Button } from 'react-native-elements'
 import { FloatingLabelInput } from 'react-native-floating-label-input';
+import {useDispatch, useSelector} from "react-redux";
+import {addFilm} from "../redux/actions";
 
 const submitBtn = {
     width: '50%',
@@ -23,8 +25,14 @@ const AddForm = ({navigation, route}) => {
     const [type, setType] = useState('');
     const [year, setYear] = useState('');
 
-    const { movieData } = route.params;
-    const { setMovieData } = route.params;
+    const { filmsData } = useSelector(state => state.filmsReducer);
+    const dispatch = useDispatch();
+
+    const addToStorage = films => dispatch(addFilm(films));
+
+    const handleAddFilm = films => {
+        addToStorage(films);
+    };
 
     let idForNewItem = 100;
 
@@ -56,9 +64,9 @@ const AddForm = ({navigation, route}) => {
             Poster: 'N/A',
         }
 
-        const newData = [...movieData, newItem]
+        const newData = [...filmsData, newItem]
 
-        setMovieData(newData)
+        handleAddFilm(newData)
 
         navigation.navigate('Movie')
     }

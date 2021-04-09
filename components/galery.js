@@ -50,8 +50,6 @@ const Gallery = ({ gallery, width, height}) => {
         </TouchableHighlight>
     );
 
-    console.log(gallery[0])
-
     return (
         <>
             <View style={styles.imageBlockContainer}>

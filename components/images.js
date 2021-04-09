@@ -133,18 +133,11 @@ const Images = ({ navigation }) => {
     function cacheImages(images) {
         return images.map(image => {
             if (typeof image.uri === 'string') {
-                console.log(image.uri)
                 return Image.prefetch(image.uri);
             } else {
-                console.log('else ', image)
                 return Asset.fromModule(image).downloadAsync();
             }
         });
-    }
-
-    const _loadAssetsAsync = async () => {
-        const imageAssets = cacheImages(data);
-        await Promise.all([...imageAssets]);
     }
 
     const useScreenDimensions = () => {
@@ -170,29 +163,18 @@ const Images = ({ navigation }) => {
 
     const galleryComponent = arraySubSplitter(gallery).map(
         image => {
-            if (!isReady) {
-                return (
-                    <AppLoading
-                        key={image[0].uri}
-                        startAsync={_loadAssetsAsync}
-                        onFinish={() => setIsReady(true)}
-                        onError={console.warn}
-                    />
-                );
-            } else {
-                return (
-                    <Gallery
-                        key={image[0].uri}
-                        gallery={image}
-                        width={screenData.width / 4}
-                        height={
-                            screenData.isLandscape === true ?
-                                screenData.height / 2.3 :
-                                screenData.height / 6.5
-                        }
-                    />
-                )
-            }
+            return (
+                <Gallery
+                    key={image[0].uri}
+                    gallery={image}
+                    width={screenData.width / 4}
+                    height={
+                        screenData.isLandscape === true ?
+                            screenData.height / 2.3 :
+                            screenData.height / 6.5
+                    }
+                />
+            )
         }
     );
 
