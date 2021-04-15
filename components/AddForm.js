@@ -5,21 +5,22 @@ import { View,
 } from 'react-native';
 import { Button } from 'react-native-elements'
 import { FloatingLabelInput } from 'react-native-floating-label-input';
-import {useDispatch, useSelector} from "react-redux";
-import {addFilm} from "../redux/actions";
+import { useDispatch, useSelector } from "react-redux";
+import { addFilm } from "../redux/actions";
 
-const submitBtn = {
-    width: '50%',
+const BtnTheme = {
     dark: false,
     colors: {
-        primary: '#beae8d',
-        background: 'rgb(242, 242, 242)',
-        borderRadius: '20%'
+        primary: '#bd99fc',
+        background: '#ffe0e1',
+        card: 'rgb(255, 255, 255)',
+        text: 'rgb(28, 28, 30)',
+        border: 'rgb(199, 199, 204)',
+        notification: 'rgb(255, 69, 58)',
     },
-};
+}
 
-
-const AddForm = ({navigation, route}) => {
+const AddForm = ({ navigation }) => {
 
     const [title, setTitle] = useState('');
     const [type, setType] = useState('');
@@ -146,9 +147,8 @@ const AddForm = ({navigation, route}) => {
                         onPress={() => {
                             submit()
                         }}
-                        theme={submitBtn}
+                        theme={ BtnTheme }
                         title="Add"
-                        color="#000"
                         buttonStyle={{ width: 150 }}
                     />
                 </View>

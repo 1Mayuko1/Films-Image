@@ -1,9 +1,15 @@
-import React, { useEffect }from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableHighlight, View } from 'react-native';
+import React, { useEffect } from 'react';
+import {
+    Dimensions, Image,
+    ScrollView, StyleSheet,
+    Text, TouchableHighlight,
+    View
+} from 'react-native';
 import * as Network from 'expo-network';
-import StatusMessage from './statusMessage'
-import {useDispatch, useSelector} from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { addFilmInfo } from "../redux/actions";
+import Loader from "../components/Loader";
+import NoItemsScreen from "./NoItemsScreen";
 
 
 const orientation = () => {
@@ -17,7 +23,6 @@ const orientation = () => {
 
 const Info = ({route}) => {
 
-    const [fullInfo, setFullInfo] = React.useState([])
     const { Id } = route.params;
 
     const { filmInfoStorageData } = useSelector(state => state.filmsReducer);
@@ -29,44 +34,59 @@ const Info = ({route}) => {
         addToStorage(films);
     };
 
+    const getUniqueInfoList = (arr, key) => {
+        return [...new Map(arr.map(item => [item[key], item])).values()]
+    }
+
     useEffect(() => {
         let cleanupFunction = false;
         const fetchData = async () => {
             try {
                 if((await Network.getNetworkStateAsync()).isConnected) {
-                    // fetch(`https://www.omdbapi.com/?apikey=2965961d&i=${Id}`)
-                    //     .then(response => response.json() )
-                    //     .then(data =>  handleAddFilmInfo([data]) )
-                } else {
-
-                }
-                // if(!cleanupFunction) {
-                //     setFullInfo(['data']);
-                // }
-            } catch (e) {
-                console.error(e.message)
+                    fetch(`https://www.omdbapi.com/?apikey=2965961d&i=${Id}`)
+                        .then(response => response.json())
+                        .then(
+                            (data) => {
+                                const filteredFilmInfo =
+                                    getUniqueInfoList(
+                                        [data, ...filmInfoStorageData],
+                                        'imdbID'
+                                    )
+                                handleAddFilmInfo(filteredFilmInfo)
+                            }
+                        )
+                    }
+                } catch (e) {
+                    console.error(e.message)
             }
         };
         fetchData();
         return () => cleanupFunction = true;
     }, []);
 
+    let checkingForExistInDatabase = []
+
     return (
-        <ScrollView>
+        <ScrollView style={{backgroundColor: '#f9e5ea'}}>
             <View>
+                <Loader loading={true}/>
                 <View style={{ flex: 0, alignItems: 'center', justifyContent: 'center' }}>
                     {
-                        filmInfoStorageData.map((item, index) => {
-                            if(item.imdbID !== Id) {
-                                return (
-                                    <View key={Id}>
-                                        <StatusMessage
-                                            text={'Try turning on the Internet or finding a movie info that already exists in the database'}
-                                            additionalText={'There is no information about this movie in the database'}
-                                        />
-                                    </View>
-                                )
-                            } else {
+                        filmInfoStorageData.length === 0 ?
+                            <View key={Id}>
+                                <NoItemsScreen
+                                    text={
+                                        'Oops, I can\'t find movies details in' +
+                                        ' the database with that movie.' +
+                                        ' Please check your internet connection and' +
+                                        ' try again or find a movie that' +
+                                        ' already exists in the database'
+                                    }
+                                />
+                            </View> :
+                        filmInfoStorageData.map(item => {
+                            if( item.imdbID === Id ) {
+                                checkingForExistInDatabase.push('')
                                 return(
                                     <View key={Id}>
                                         <View style={orientation().mainTopContainer}>
@@ -75,8 +95,8 @@ const Info = ({route}) => {
                                                     resizeMode="cover"
                                                     source={
                                                         item.Poster === 'N/A' ?
-                                                            require('../assets/Coming-Soon.png') :
-                                                            { uri: item.Poster }
+                                                            require('../assets/nothing.jpg') :
+                                                            {uri: item.Poster}
                                                     }
                                                     style={orientation().img}
                                                 />
@@ -88,33 +108,33 @@ const Info = ({route}) => {
                                                 <View>
                                                     <Text
                                                         style={orientation().topTxt
-                                                    }>
+                                                        }>
                                                         Year - {item.Year}
                                                     </Text>
                                                 </View>
                                                 <View>
                                                     <Text
                                                         style={orientation().topTxt
-                                                    }>
+                                                        }>
                                                         Rating: {item.imdbRating}
                                                     </Text>
                                                     <Text
                                                         style={orientation().topTxt
-                                                    }>
+                                                        }>
                                                         {item.imdbVotes} people voted
                                                     </Text>
                                                 </View>
                                                 <View>
                                                     <Text
                                                         style={orientation().topTxt
-                                                    }>
+                                                        }>
                                                         {item.Genre}
                                                     </Text>
                                                 </View>
                                                 <View>
                                                     <Text
                                                         style={orientation().topTxt
-                                                    }>
+                                                        }>
                                                         Duration - {item.Runtime}
                                                     </Text>
                                                 </View>
@@ -145,6 +165,21 @@ const Info = ({route}) => {
                                 )
                             }
                         })
+                    }
+                </View>
+                <View key={Id}>
+                    {
+                        checkingForExistInDatabase.length === 0 ?
+                            <NoItemsScreen
+                                text={
+                                    'Oops, I can\'t find movies details in' +
+                                    ' the database with that movie.' +
+                                    ' Please check your internet connection and' +
+                                    ' try again or find a movie that' +
+                                    ' already exists in the database'
+                                }
+                            /> :
+                        null
                     }
                 </View>
             </View>

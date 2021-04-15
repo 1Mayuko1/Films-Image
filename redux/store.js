@@ -8,7 +8,6 @@ import filmsReducer from './reducers';
 const persistConfig = {
     key: 'auth',
     storage: AsyncStorage,
-    // whitelist: ['filmStorage']
 };
 
 const rootReducer = combineReducers({

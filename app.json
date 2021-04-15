@@ -1,20 +1,12 @@
 {
   "expo": {
-    "packagerOpts": {
-      "assetExts": ["db"]
-    },
-    "name": "lab7",
+    "name": "Filmoro",
     "slug": "lab7",
     "version": "1.0.0",
     "icon": "./assets/icon.png",
     "ios": {
       "requireFullScreen": true,
       "supportsTablet": true
-    },
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

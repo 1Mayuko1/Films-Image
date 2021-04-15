@@ -1,27 +1,16 @@
 import React from 'react';
-import {View} from 'react-native';
+import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import Icon from 'react-native-vector-icons/FontAwesome'
-import Home from "../components/home";
-import Profile from "../components/profile";
-import Movie from "../components/movie";
-import Info from "../components/info";
-import AddForm from "../components/addForm";
-import Images from "../components/images";
-
-const MyTheme = {
-    dark: false,
-    colors: {
-        primary: '#475861',
-        background: 'rgb(242, 242, 242)',
-        card: '#beae8d',
-        text: 'rgb(28, 28, 30)',
-        border: 'rgb(199, 199, 204)',
-        notification: 'rgb(255, 69, 58)',
-    },
-};
+import AboutMe from "../components/AboutMe";
+import Chart from "../components/Chart";
+import Movie from "../components/Movie";
+import Info from "../components/Info";
+import AddForm from "../components/AddForm";
+import Images from "../components/Images";
+import { MainBottomTabsTheme } from '../constants/data'
 
 const Stack = createStackNavigator();
 
@@ -30,7 +19,7 @@ const movieStackScreen = () => {
         <Stack.Navigator initialRouteName="Movie">
             <Stack.Screen
                 name="Movie"
-                component={Movie}
+                component={ Movie }
                 options={{
                     headerShown: false,
                     tabBarLabel: 'Movie',
@@ -59,25 +48,25 @@ const Tab = createMaterialBottomTabNavigator();
 
 const RootNavigator = () => {
     return (
-        <NavigationContainer theme={MyTheme}>
+        <NavigationContainer theme={MainBottomTabsTheme}>
             <Tab.Navigator
                 shifting={true}
-                sceneAnimationEnabled={false}
-                initialRouteName="Home"
+                sceneAnimationEnabled={true}
+                initialRouteName="AboutMe"
                 activeColor="#EAE7ED"
                 labelStyle={{ fontSize: 12 }}
             >
                 <Tab.Screen
                     name="Home"
-                    component={Home}
+                    component={AboutMe}
                     options={{
-                        tabBarLabel: 'Chart',
+                        tabBarLabel: 'AboutMe',
                         tabBarIcon: () => (
                             <View>
                                 <Icon
                                     style={[{color: '#F9F3E7'}]}
                                     size={25}
-                                    name={'area-chart'}
+                                    name={'info'}
                                 />
                             </View>
                         ),
@@ -85,9 +74,9 @@ const RootNavigator = () => {
                 />
                 <Tab.Screen
                     name="Profile"
-                    component={Profile}
+                    component={Chart}
                     options={{
-                        tabBarLabel: 'Pie',
+                        tabBarLabel: 'Chart',
                         tabBarIcon: () => (
                             <View>
                                 <Icon

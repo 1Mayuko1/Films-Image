@@ -39,11 +39,11 @@ const Gallery = ({ gallery, width, height}) => {
                 style={optionsStyles}
                 source={{
                     uri: uri.uri,
-                    cache: 'force-cache'
-                    // Використовується uri з кешу.
-                    // Якщо такого зображення в кеші немає.
-                    // Воно буде взято з API
-                    // Та завантажено в кеш
+                    // cache: 'force-cache'
+                    // // Використовується uri з кешу.
+                    // // Якщо такого зображення в кеші немає.
+                    // // Воно буде взято з API
+                    // // Та завантажено в кеш
                 }}
                 threshold={150}
         />
